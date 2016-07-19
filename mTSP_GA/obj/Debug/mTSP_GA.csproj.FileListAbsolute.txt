@@ -1,0 +1,7 @@
+c:\users\césar\documents\visual studio 2015\Projects\mTSP_GA\mTSP_GA\bin\Debug\mTSP_GA.exe.config
+c:\users\césar\documents\visual studio 2015\Projects\mTSP_GA\mTSP_GA\obj\Debug\mTSP_GA.csprojResolveAssemblyReference.cache
+c:\users\césar\documents\visual studio 2015\Projects\mTSP_GA\mTSP_GA\bin\Debug\mTSP_GA.exe
+c:\users\césar\documents\visual studio 2015\Projects\mTSP_GA\mTSP_GA\bin\Debug\mTSP_GA.pdb
+c:\users\césar\documents\visual studio 2015\Projects\mTSP_GA\mTSP_GA\bin\Debug\GAF.dll
+c:\users\césar\documents\visual studio 2015\Projects\mTSP_GA\mTSP_GA\obj\Debug\mTSP_GA.exe
+c:\users\césar\documents\visual studio 2015\Projects\mTSP_GA\mTSP_GA\obj\Debug\mTSP_GA.pdb
