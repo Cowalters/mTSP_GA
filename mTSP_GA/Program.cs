@@ -20,58 +20,60 @@ namespace mTSP_GA
         private static void Main(string[] args)
         {
             heliport = new City("Heliport", 0.0, 0.0);
-            //get our cities
+            // Create our cities
             _cities = CreateCities().ToList();
 
-            //Each city can be identified by an integer within the range 0-15
-            //our chromosome is a special case as it needs to contain each city 
-            //only once. Therefore, our chromosome will contain all the integers
-            //between 0 and 15 with no duplicates.
+            // Each city can be identified by an integer within the range 0-15
+            // our chromosome is a special case as it needs to contain each city 
+            // only once. Therefore, our chromosome will contain all the integers
+            // between 0 and 15 with no duplicates.
 
-            //We can create an empty population as we will be creating the 
-            //initial solutions manually.
+            // We can create an empty population as we will be creating the 
+            // initial solutions manually.
             var population = new Population();
 
-            //create the chromosomes
+            // Create the chromosomes
             for (var p = 0; p < 100; p++)
             {
 
                 var chromosome = new Chromosome();
                 for (var g = 0; g < NUMBER_OF_CITIES; g++)
                 {
-                    //chromosome.Genes.Add(new Gene(g));
-                    chromosome.Genes.Add(new Gene(new List<int> (g)));
+                    chromosome.Genes.Add(new Gene(g));
+                    //chromosome.Genes.Add(new Gene(new List<int> (g)));
                 }
                 chromosome.Genes.ShuffleFast();
                 population.Solutions.Add(chromosome);
             }
 
-            //create the elite operator
+            // Create the elite operator
             var elite = new Elite(5);
 
-            //create the crossover operator
+            // Create the crossover operator
             var crossover = new Crossover(0.8)
             {
                 CrossoverType = CrossoverType.DoublePointOrdered
             };
 
-            //create the mutation operator
+            // Create the mutation operator
             var mutate = new SwapMutate(0.02);
 
-            //create the GA
+            // Create the GA
             var ga = new GeneticAlgorithm(population, CalculateFitness);
 
             //hook up to some useful events
             ga.OnGenerationComplete += ga_OnGenerationComplete;
             ga.OnRunComplete += ga_OnRunComplete;
 
-            //add the operators
+            // Add the operators
             ga.Operators.Add(elite);
             ga.Operators.Add(crossover);
             ga.Operators.Add(mutate);
 
-            //run the GA
+            // Run the GA
             ga.Run(Terminate);
+
+            // Wait for user input to close the program.
             Console.ReadLine();
         }
 
@@ -82,10 +84,9 @@ namespace mTSP_GA
             {
                 Console.WriteLine(_cities[(int)gene.RealValue].Name);
             }
-            // Call the each algorithm to generate solution.
+            // Call the algorithm to generate the mTSP solution.
             // For now:
             // 1) var hillClimbing_mTSP = new HillClimbingAlgorithm(fittest, NUMBER_OF_DRONES);
-            // 2) var multiChromosomeTechnique_mTSP = new MultiChromosomeTechnique(fittest, NUMBER_OF_DRONES);
         }
 
         private static void ga_OnGenerationComplete(object sender, GaEventArgs e)
@@ -112,7 +113,7 @@ namespace mTSP_GA
             var distanceToTravel = 0.0;
             City previousCity = null;
 
-            //run through each city in the order specified in the chromosome
+            // Run through each city in the order specified in the chromosome
             foreach (var gene in chromosome.Genes)
             {
                 var currentCity = _cities[(int)gene.RealValue];
