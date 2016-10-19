@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Diagnostics;
 using GAF;
 using GAF.Extensions;
 using GAF.Operators;
@@ -14,32 +12,45 @@ namespace mTSP_GA
     {
         private static int NUMBER_OF_CITIES;
         private static int NUMBER_OF_DRONES;
+        private static int NUMBER_OF_GENERATIONS;
         private static int POPULATION_SIZE;
         private static double CROSSOVER_PROBABILITY;
         private static double MUTATION_PROBABILITY;
         private static List<City> CITIES;
-        private static City HELIPORT;
+        private static City DEPOT;
+        private static bool FITNESS_CONSIDER_PARTITIONS;
+        private static bool IS_CALIBRATION;
+        private static Stopwatch STOPWATCH = new Stopwatch();
+        private static double solution;
+        private static double timeElapsed;
+        private static int[] partitionPoints;
+        private static Chromosome fittestChromosome;
 
-        public AlgorithmExecutor(List<City> cities, int numberOfDrones, int populationSize,
-            double crossoverProbability, double mutationProbability)
+        public AlgorithmExecutor(
+            List<City> cities,
+            City depot,
+            int numberOfDrones,
+            int numberOfGenerations,
+            int populationSize,
+            double crossoverProbability,
+            double mutationProbability,
+            bool fitnessConsidersPartitions,
+            bool isCalibration)
         {
             CITIES = cities;
+            DEPOT = depot;
             NUMBER_OF_CITIES = cities.Count;
             NUMBER_OF_DRONES = numberOfDrones;
+            NUMBER_OF_GENERATIONS = numberOfGenerations;
             POPULATION_SIZE = populationSize;
             CROSSOVER_PROBABILITY = crossoverProbability;
             MUTATION_PROBABILITY = mutationProbability;
+            FITNESS_CONSIDER_PARTITIONS = fitnessConsidersPartitions;
+            IS_CALIBRATION = isCalibration;
         }
 
         public void RunGAInstance()
         {
-            HELIPORT = new City("Heliport", 0.0, 0.0);
-
-            // Each city can be identified by an integer within the range 0-15
-            // our chromosome is a special case as it needs to contain each city 
-            // only once. Therefore, our chromosome will contain all the integers
-            // between 0 and 15 with no duplicates.
-
             // We can create an empty population as we will be creating the 
             // initial solutions manually.
             var population = new Population();
@@ -59,7 +70,7 @@ namespace mTSP_GA
             }
 
             // Create the elite operator
-            var elite = new Elite(5);
+            var elite = new Elite(15);
 
             // Create the crossover operator
             var crossover = new Crossover(CROSSOVER_PROBABILITY)
@@ -82,11 +93,31 @@ namespace mTSP_GA
             ga.Operators.Add(crossover);
             ga.Operators.Add(mutate);
 
+            // Begin timing
+            STOPWATCH.Restart();
+
             // Run the GA
             ga.Run(Terminate);
+        }
 
-            // Wait for user input to close the program.
-            Console.ReadLine();
+        public static double getSolution()
+        {
+            return solution;
+        }
+
+        public static double getTimeElapsed()
+        {
+            return timeElapsed;
+        }
+
+        public static int[] getPartitionPoints()
+        {
+            return partitionPoints;
+        }
+
+        public static Chromosome getFittestChromosome()
+        {
+            return fittestChromosome;
         }
 
         static void ga_OnRunComplete(object sender, GaEventArgs e)
@@ -94,18 +125,52 @@ namespace mTSP_GA
             var fittest = e.Population.GetTop(1)[0];
             foreach (var gene in fittest.Genes)
             {
-                Console.WriteLine(CITIES[(int)gene.RealValue].Name);
+                //Console.WriteLine(CITIES[(int)gene.RealValue].Name);
             }
+
             // Call the algorithm to generate the mTSP solution.
-            // For now:
-            // 1) var hillClimbing_mTSP = new HillClimbingAlgorithm(fittest, NUMBER_OF_DRONES);
+            var greedy_mTSP = new GreedyAlgorithm(fittestToCitiesList(fittest), DEPOT, NUMBER_OF_DRONES);
+            solution = greedy_mTSP.solve().Item1;
+            partitionPoints = greedy_mTSP.solve().Item2;
+            timeElapsed = STOPWATCH.ElapsedMilliseconds;
+            fittestChromosome = fittest;
+
+            Console.WriteLine("Final solution (MinMax cost): {0}", solution);
+            Console.WriteLine("Time elapsed: {0} ms", STOPWATCH.ElapsedMilliseconds);
+        }
+
+        private static List<City> fittestToCitiesList(Chromosome fittest)
+        {
+            List<City> TSPSequence = new List<City>();
+            
+            foreach (var gene in fittest.Genes)
+            {
+                TSPSequence.Add(CITIES[(int)gene.RealValue]);
+            }
+
+            return TSPSequence;
         }
 
         private static void ga_OnGenerationComplete(object sender, GaEventArgs e)
         {
-            var fittest = e.Population.GetTop(1)[0];
-            var distanceToTravel = CalculateDistance(fittest);
-            Console.WriteLine("Generation: {0}, Fitness: {1}, Distance: {2}", e.Generation, fittest.Fitness, distanceToTravel);
+            if ((!IS_CALIBRATION && e.Generation % 100 == 0) || e.Generation == NUMBER_OF_GENERATIONS)
+            {
+                var fittest = e.Population.GetTop(1)[0];
+                var distanceToTravel = 0.0;
+
+                if (!FITNESS_CONSIDER_PARTITIONS)
+                {
+                    distanceToTravel = CalculateDistance(fittest);
+                }
+                else
+                {
+                    var greedy_mTSP =
+                        new GreedyAlgorithm(fittestToCitiesList(fittest), DEPOT, NUMBER_OF_DRONES);
+                    distanceToTravel = greedy_mTSP.solve().Item1;
+                }
+
+                Console.WriteLine("Generation: {0}, Fitness: {1}, Distance: {2}", e.Generation, fittest.Fitness, distanceToTravel);
+            }
         }
 
         private static IEnumerable<City> CreateCities()
@@ -116,7 +181,17 @@ namespace mTSP_GA
 
         public static double CalculateFitness(Chromosome chromosome)
         {
-            var distanceToTravel = CalculateDistance(chromosome);
+            var distanceToTravel = 0.0;
+            if (!FITNESS_CONSIDER_PARTITIONS)
+            {
+                distanceToTravel = CalculateDistance(chromosome);
+            }
+            else
+            {
+                var greedy_mTSP =
+                    new GreedyAlgorithm(fittestToCitiesList(chromosome), DEPOT, NUMBER_OF_DRONES);
+                distanceToTravel = greedy_mTSP.solve().Item1; 
+            }
             return 1 - distanceToTravel / 10000;
         }
 
@@ -138,20 +213,19 @@ namespace mTSP_GA
                 }
                 else
                 {
-                    distanceToTravel += HELIPORT.GetDistanceFromPosition(currentCity.xCoord, currentCity.yCoord);
+                    distanceToTravel += DEPOT.GetDistanceFromPosition(currentCity.xCoord, currentCity.yCoord);
                 }
                 previousCity = currentCity;
             }
-            // Back to the heliport distance
-            distanceToTravel += HELIPORT.GetDistanceFromPosition(previousCity.xCoord, previousCity.yCoord);
+            // Back to the depot distance
+            distanceToTravel += DEPOT.GetDistanceFromPosition(previousCity.xCoord, previousCity.yCoord);
 
             return distanceToTravel;
         }
 
-        public static bool Terminate(Population population,
-            int currentGeneration, long currentEvaluation)
+        public static bool Terminate(Population population, int currentGeneration, long currentEvaluation)
         {
-            return currentGeneration > 400;
+            return currentGeneration > NUMBER_OF_GENERATIONS;
         }
     }
 }

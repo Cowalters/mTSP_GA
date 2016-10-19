@@ -50,7 +50,7 @@
     <Compile Include="City.cs" />
     <Compile Include="CityGenerator.cs" />
     <Compile Include="Program.cs" />
-    <Compile Include="HillClimbingAlgorithm.cs" />
+    <Compile Include="GreedyAlgorithm.cs" />
     <Compile Include="AlgorithmExecutor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
