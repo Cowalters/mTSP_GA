@@ -19,17 +19,5 @@ namespace mTSP_GA
         {
             return Math.Sqrt((xCoord - otherXCoord) * (xCoord - otherXCoord) + (yCoord - otherYCoord) * (yCoord - otherYCoord));
         }
-
-        private static double DegreesToRadians(double deg)
-        {
-            return deg * (System.Math.PI / 180);
-        }
-
-        public byte[] ToBinaryString()
-        {
-            var result = new byte[6];
-
-            return result;
-        }
     }
 }

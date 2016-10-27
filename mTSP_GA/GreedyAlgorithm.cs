@@ -28,10 +28,6 @@ namespace mTSP_GA
             double[] currCosts = currentDroneAndCost.Item3;
             int[] bestPartition = partitionPoints;
 
-            //double cost = 0;
-            //int bestClimber;
-            //bool goUp = false;
-
             while (numberOfIterations > 0)
             {
                 if(currDrone == 0)
@@ -68,57 +64,8 @@ namespace mTSP_GA
                     Array.Copy(partitionPoints, bestPartition, partitionPoints.Length);
                     bestCost = currentDroneAndCost.Item2;
                 }
-
-                //bestClimber = -1;
-                //for (int i = 0; i < partitionPoints.Length; ++i)
-                //{
-                //    if (partitionPoints[i] > 0
-                //        && (i == 0 || partitionPoints[i] > partitionPoints[i - 1] + 1))
-                //    {
-                //        partitionPoints[i]--;
-                //        double currentCost = calculateAllCosts(partitionPoints);
-                //        if (currentCost < bestCost)
-                //        {
-                //            bestCost = currentCost;
-                //            bestClimber = i;
-                //            goUp = true;
-                //            Console.WriteLine("BIZUROU");
-                //        }
-                //        partitionPoints[i]++;
-                //    }
-                //    if (partitionPoints[i] < cities.Count - 2
-                //        && (i == partitionPoints.Length - 1 || partitionPoints[i] + 1 < partitionPoints[i + 1]))
-                //    {
-                //        partitionPoints[i]++;
-                //        double currentCost = calculateAllCosts(partitionPoints);
-                //        if (currentCost < bestCost)
-                //        {
-                //            bestCost = currentCost;
-                //            bestClimber = i;
-                //            goUp = false;
-                //            Console.WriteLine("BIZUROU");
-                //        }
-                //        partitionPoints[i]--;
-                //    }
-                //}
-                //if (bestClimber >= 0)
-                //{
-                //    Console.WriteLine("CLIMBOU: {0}", partitionPoints[bestClimber]);
-                //    partitionPoints[bestClimber] += (goUp ? 1 : -1);
-                //    Console.WriteLine("PARA: {0}", partitionPoints[bestClimber]);
-                //}
-                //cost = bestCost;
                 numberOfIterations--;
             }
-
-            //Console.WriteLine("PARTITIONS");
-
-            for (int i = 0; i < partitionPoints.Length; ++i)
-            {
-                //Console.WriteLine("Partition {0}: {1}", i + 1, partitionPoints[i]); 
-            }
-
-            //Console.WriteLine("Final solution (MinMax cost): {0}", bestCost);
 
             return new Tuple<double, int[]> (bestCost, bestPartition);
         }
@@ -156,11 +103,6 @@ namespace mTSP_GA
                     else nextPartition = partitionPoints[droneId];
                     previousCity = depot;
                 }
-            }
-
-            for (int i = 0; i < costForDrone.Length; ++i)
-            {
-                //Console.WriteLine("Cost for drone {0}: {1}", i + 1, costForDrone[i]);
             }
 
             return maxDroneCost(costForDrone);

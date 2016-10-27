@@ -63,14 +63,13 @@ namespace mTSP_GA
                 for (var g = 0; g < NUMBER_OF_CITIES; g++)
                 {
                     chromosome.Genes.Add(new Gene(g));
-                    //chromosome.Genes.Add(new Gene(new List<int> (g)));
                 }
                 chromosome.Genes.ShuffleFast();
                 population.Solutions.Add(chromosome);
             }
 
             // Create the elite operator
-            var elite = new Elite(15);
+            var elite = new Elite(5);
 
             // Create the crossover operator
             var crossover = new Crossover(CROSSOVER_PROBABILITY)
@@ -122,14 +121,10 @@ namespace mTSP_GA
 
         static void ga_OnRunComplete(object sender, GaEventArgs e)
         {
-            var fittest = e.Population.GetTop(1)[0];
-            foreach (var gene in fittest.Genes)
-            {
-                //Console.WriteLine(CITIES[(int)gene.RealValue].Name);
-            }
+            var fittest = getFittestChromosome(e.Population);
 
             // Call the algorithm to generate the mTSP solution.
-            var greedy_mTSP = new GreedyAlgorithm(fittestToCitiesList(fittest), DEPOT, NUMBER_OF_DRONES);
+            var greedy_mTSP = new GreedyAlgorithm(Utils.fittestToCitiesList(CITIES, fittest), DEPOT, NUMBER_OF_DRONES);
             solution = greedy_mTSP.solve().Item1;
             partitionPoints = greedy_mTSP.solve().Item2;
             timeElapsed = STOPWATCH.ElapsedMilliseconds;
@@ -139,23 +134,14 @@ namespace mTSP_GA
             Console.WriteLine("Time elapsed: {0} ms", STOPWATCH.ElapsedMilliseconds);
         }
 
-        private static List<City> fittestToCitiesList(Chromosome fittest)
-        {
-            List<City> TSPSequence = new List<City>();
-            
-            foreach (var gene in fittest.Genes)
-            {
-                TSPSequence.Add(CITIES[(int)gene.RealValue]);
-            }
-
-            return TSPSequence;
-        }
-
+        // Callback for when a generation completes its iteration.
         private static void ga_OnGenerationComplete(object sender, GaEventArgs e)
         {
+            // We print in the console the current results of the algorithm for every 100 generations
+            // when not in calibration mode. When calibration, we print only for the last generation.
             if ((!IS_CALIBRATION && e.Generation % 100 == 0) || e.Generation == NUMBER_OF_GENERATIONS)
             {
-                var fittest = e.Population.GetTop(1)[0];
+                var fittest = getFittestChromosome(e.Population);
                 var distanceToTravel = 0.0;
 
                 if (!FITNESS_CONSIDER_PARTITIONS)
@@ -165,7 +151,7 @@ namespace mTSP_GA
                 else
                 {
                     var greedy_mTSP =
-                        new GreedyAlgorithm(fittestToCitiesList(fittest), DEPOT, NUMBER_OF_DRONES);
+                        new GreedyAlgorithm(Utils.fittestToCitiesList(CITIES, fittest), DEPOT, NUMBER_OF_DRONES);
                     distanceToTravel = greedy_mTSP.solve().Item1;
                 }
 
@@ -173,12 +159,24 @@ namespace mTSP_GA
             }
         }
 
-        private static IEnumerable<City> CreateCities()
+        // Returns the chromosome with higher fitness within a population.
+        private static Chromosome getFittestChromosome(Population pop)
         {
-            var cityGenerator = new CityGenerator(NUMBER_OF_CITIES);
-            return cityGenerator.generatedCities;
+            double minCost = Double.MaxValue;
+            Chromosome fittest = new Chromosome();
+            foreach (Chromosome c in pop.GetTopPercent(100))
+            {
+                double cost = CalculateDistance(c);
+                if (cost < minCost)
+                {
+                    minCost = cost;
+                    fittest = c;
+                }
+            }
+            return fittest;
         }
 
+        // Calculates the fitness of a chromosome.
         public static double CalculateFitness(Chromosome chromosome)
         {
             var distanceToTravel = 0.0;
@@ -189,12 +187,14 @@ namespace mTSP_GA
             else
             {
                 var greedy_mTSP =
-                    new GreedyAlgorithm(fittestToCitiesList(chromosome), DEPOT, NUMBER_OF_DRONES);
+                    new GreedyAlgorithm(Utils.fittestToCitiesList(CITIES, chromosome), DEPOT, NUMBER_OF_DRONES);
                 distanceToTravel = greedy_mTSP.solve().Item1; 
             }
             return 1 - distanceToTravel / 10000;
         }
 
+        // Calculates the distances involve in traveling through the cities in the sequence
+        // contained in a given chromosome. It also includes traveling from and to the depot.
         private static double CalculateDistance(Chromosome chromosome)
         {
             var distanceToTravel = 0.0;
@@ -223,6 +223,7 @@ namespace mTSP_GA
             return distanceToTravel;
         }
 
+        // Criteria for stopping the GA.
         public static bool Terminate(Population population, int currentGeneration, long currentEvaluation)
         {
             return currentGeneration > NUMBER_OF_GENERATIONS;

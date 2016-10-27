@@ -49,6 +49,7 @@
   <ItemGroup>
     <Compile Include="City.cs" />
     <Compile Include="CityGenerator.cs" />
+    <Compile Include="Utils.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="GreedyAlgorithm.cs" />
     <Compile Include="AlgorithmExecutor.cs" />
