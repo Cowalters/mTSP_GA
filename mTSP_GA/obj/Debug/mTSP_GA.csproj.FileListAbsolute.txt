@@ -5,3 +5,10 @@ c:\users\césar\documents\visual studio 2015\Projects\mTSP_GA\mTSP_GA\bin\Debug\
 c:\users\césar\documents\visual studio 2015\Projects\mTSP_GA\mTSP_GA\bin\Debug\GAF.dll
 c:\users\césar\documents\visual studio 2015\Projects\mTSP_GA\mTSP_GA\obj\Debug\mTSP_GA.exe
 c:\users\césar\documents\visual studio 2015\Projects\mTSP_GA\mTSP_GA\obj\Debug\mTSP_GA.pdb
+C:\Users\cesar\OneDrive\Documentos\TG code\mTSP_GA\mTSP_GA\bin\Debug\mTSP_GA.exe.config
+C:\Users\cesar\OneDrive\Documentos\TG code\mTSP_GA\mTSP_GA\bin\Debug\mTSP_GA.exe
+C:\Users\cesar\OneDrive\Documentos\TG code\mTSP_GA\mTSP_GA\bin\Debug\mTSP_GA.pdb
+C:\Users\cesar\OneDrive\Documentos\TG code\mTSP_GA\mTSP_GA\bin\Debug\GAF.dll
+C:\Users\cesar\OneDrive\Documentos\TG code\mTSP_GA\mTSP_GA\obj\Debug\mTSP_GA.csprojResolveAssemblyReference.cache
+C:\Users\cesar\OneDrive\Documentos\TG code\mTSP_GA\mTSP_GA\obj\Debug\mTSP_GA.exe
+C:\Users\cesar\OneDrive\Documentos\TG code\mTSP_GA\mTSP_GA\obj\Debug\mTSP_GA.pdb

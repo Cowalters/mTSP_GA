@@ -8,12 +8,12 @@ namespace mTSP_GA
 
     internal class Program
     {
-        // Values for calibration
+        // Values for calibration.
         private static int NUMBER_OF_GENERATIONS_CALIBRATION_STRAT_1 = 1000;
         private static int NUMBER_OF_GENERATIONS_CALIBRATION_STRAT_2 = 200;
         private static int NUMBER_OF_TEST_CASES_CALIBRATION = 100;
 
-        // Value for running a specific instance
+        // Value for running a specific instance.
         private static int NUMBER_OF_GENERATIONS_STRAT_1 = 300000;
         private static int NUMBER_OF_GENERATIONS_STRAT_2 = 50000;
 
@@ -25,10 +25,18 @@ namespace mTSP_GA
         private static void Main(string[] args)
         {
             CITIES = new List<City>();
-            if (true)
+
+            Console.WriteLine("To run the calibration mode (100 random instances), press 'C' or 'c' and then ENTER.");
+            Console.WriteLine("The results will then be stored as 'output_strat1.txt' and 'output_strat2.txt'.");
+            Console.WriteLine("Otherwise, press just ENTER and the application will run the 3 sample instances.");
+
+            // Read user input.
+            string input = Console.ReadLine();
+
+            if (input != "c" && input != "C")
             {
                 List<string> inputFiles = new List<string>();
-                // Add the input files
+                // Add the input files.
                 inputFiles.Add("eil51");
                 inputFiles.Add("eil76");
                 inputFiles.Add("rat99");
@@ -37,15 +45,15 @@ namespace mTSP_GA
                 {
                     string inputFile = inputFiles[i];
 
-                    // Run GA with selected parameters three times: for 2, 3 and 5 travelers
+                    // Run GA with selected parameters three times: for 2, 3 and 5 travelers.
 
-                    // Running for the case that fitness calculates the cost of TSP
+                    // Running for the case that fitness calculates the cost of TSP.
                     runGAWithParams(inputFile, 2, false, 200, 0.6, 0.1, NUMBER_OF_GENERATIONS_STRAT_1);
                     runGAWithParams(inputFile, 3, false, 200, 0.6, 0.1, NUMBER_OF_GENERATIONS_STRAT_1);
                     runGAWithParams(inputFile, 5, false, 200, 0.6, 0.1, NUMBER_OF_GENERATIONS_STRAT_1);
 
                     // Running for the case that fitness calculates the cost of mTSP
-                    // using the greedy algorithm
+                    // using the greedy algorithm.
                     runGAWithParams(inputFile, 2, true, 200, 1, 0, NUMBER_OF_GENERATIONS_STRAT_2);
                     runGAWithParams(inputFile, 3, true, 200, 1, 0, NUMBER_OF_GENERATIONS_STRAT_2);
                     runGAWithParams(inputFile, 5, true, 200, 1, 0, NUMBER_OF_GENERATIONS_STRAT_2);
@@ -56,7 +64,7 @@ namespace mTSP_GA
                 DEPOT = new City("Depot", 0.0, 0.0);
                 CITIES = Utils.CreateCities().ToList();
 
-                // 100 test cases runs for both approaches
+                // 100 test cases runs for both approaches.
                 calibrateGA(false /* fitnessConsidersPartitions */, NUMBER_OF_GENERATIONS_CALIBRATION_STRAT_1);
                 calibrateGA(true /* fitnessConsidersPartitions */, NUMBER_OF_GENERATIONS_CALIBRATION_STRAT_2);
             }
@@ -65,7 +73,7 @@ namespace mTSP_GA
             Console.ReadLine();
         }
 
-        // Runs the GA with the given parameters
+        // Runs the GA with the given parameters.
         private static void runGAWithParams(
             string fileName,
             int numberOfDrones,

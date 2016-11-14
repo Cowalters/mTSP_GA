@@ -18,7 +18,7 @@ namespace mTSP_GA
         private static double MUTATION_PROBABILITY;
         private static List<City> CITIES;
         private static City DEPOT;
-        private static bool FITNESS_CONSIDER_PARTITIONS;
+        private static bool FITNESS_CONSIDERS_PARTITIONS;
         private static bool IS_CALIBRATION;
         private static Stopwatch STOPWATCH = new Stopwatch();
         private static double solution;
@@ -45,7 +45,7 @@ namespace mTSP_GA
             POPULATION_SIZE = populationSize;
             CROSSOVER_PROBABILITY = crossoverProbability;
             MUTATION_PROBABILITY = mutationProbability;
-            FITNESS_CONSIDER_PARTITIONS = fitnessConsidersPartitions;
+            FITNESS_CONSIDERS_PARTITIONS = fitnessConsidersPartitions;
             IS_CALIBRATION = isCalibration;
         }
 
@@ -55,7 +55,7 @@ namespace mTSP_GA
             // initial solutions manually.
             var population = new Population();
 
-            // Create the chromosomes
+            // Create the chromosomes.
             for (var p = 0; p < POPULATION_SIZE; p++)
             {
 
@@ -68,34 +68,34 @@ namespace mTSP_GA
                 population.Solutions.Add(chromosome);
             }
 
-            // Create the elite operator
+            // Create the elite operator.
             var elite = new Elite(5);
 
-            // Create the crossover operator
+            // Create the crossover operator.
             var crossover = new Crossover(CROSSOVER_PROBABILITY)
             {
                 CrossoverType = CrossoverType.DoublePointOrdered
             };
 
-            // Create the mutation operator
+            // Create the mutation operator.
             var mutate = new SwapMutate(MUTATION_PROBABILITY);
 
-            // Create the GA
+            // Create the GA.
             var ga = new GeneticAlgorithm(population, CalculateFitness);
 
-            //hook up to some useful events
+            // Hook up to some useful events.
             ga.OnGenerationComplete += ga_OnGenerationComplete;
             ga.OnRunComplete += ga_OnRunComplete;
 
-            // Add the operators
+            // Add the operators.
             ga.Operators.Add(elite);
             ga.Operators.Add(crossover);
             ga.Operators.Add(mutate);
 
-            // Begin timing
+            // Begin timing.
             STOPWATCH.Restart();
 
-            // Run the GA
+            // Run the GA.
             ga.Run(Terminate);
         }
 
@@ -144,7 +144,7 @@ namespace mTSP_GA
                 var fittest = getFittestChromosome(e.Population);
                 var distanceToTravel = 0.0;
 
-                if (!FITNESS_CONSIDER_PARTITIONS)
+                if (!FITNESS_CONSIDERS_PARTITIONS)
                 {
                     distanceToTravel = CalculateDistance(fittest);
                 }
@@ -180,7 +180,7 @@ namespace mTSP_GA
         public static double CalculateFitness(Chromosome chromosome)
         {
             var distanceToTravel = 0.0;
-            if (!FITNESS_CONSIDER_PARTITIONS)
+            if (!FITNESS_CONSIDERS_PARTITIONS)
             {
                 distanceToTravel = CalculateDistance(chromosome);
             }

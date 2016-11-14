@@ -3,20 +3,12 @@ using System.Collections.Generic;
 
 namespace mTSP_GA
 {
-    class GreedyAlgorithm
+    class GreedyAlgorithm : PartitionAlgorithm
     {
-        private List<City> cities;
-        private City depot;
-        private int numberOfDrones; 
+        public GreedyAlgorithm(List<City> TSPSequence, City depot, int numberOfDrones) :
+            base(TSPSequence, depot, numberOfDrones) {}
 
-        public GreedyAlgorithm(List<City> TSPSequence, City depot, int numberOfDrones)
-        {
-            cities = TSPSequence;
-            this.depot = depot;
-            this.numberOfDrones = numberOfDrones;
-        }
-
-        public Tuple<double, int[]> solve()
+        public override Tuple<double, int[]> solve()
         {
             int[] partitionPoints = new int[numberOfDrones - 1];
             initializePartitions(partitionPoints);
@@ -26,7 +18,7 @@ namespace mTSP_GA
             int currDrone = currentDroneAndCost.Item1;
             double bestCost = currentDroneAndCost.Item2;
             double[] currCosts = currentDroneAndCost.Item3;
-            int[] bestPartition = partitionPoints;
+            int[] bestPartitionPoints = partitionPoints;
 
             while (numberOfIterations > 0)
             {
@@ -56,21 +48,25 @@ namespace mTSP_GA
                     }
                 }
 
+                // The method calculateAllCosts(int[] partitionPoints)
+                // returns a tuple containing the index of the drone that
+                // is associated to the biggest cost, the cost and an array
+                // containing the costs associated to every salesman.
                 currentDroneAndCost = calculateAllCosts(partitionPoints);
                 currDrone = currentDroneAndCost.Item1;
                 currCosts = currentDroneAndCost.Item3;
                 if (currentDroneAndCost.Item2 < bestCost)
                 {
-                    Array.Copy(partitionPoints, bestPartition, partitionPoints.Length);
+                    Array.Copy(partitionPoints, bestPartitionPoints, partitionPoints.Length);
                     bestCost = currentDroneAndCost.Item2;
                 }
                 numberOfIterations--;
             }
 
-            return new Tuple<double, int[]> (bestCost, bestPartition);
+            return new Tuple<double, int[]> (bestCost, bestPartitionPoints);
         }
 
-        private void initializePartitions(int[] partitionPoints)
+        public override void initializePartitions(int[] partitionPoints)
         {
             for (int i = 1; i <= numberOfDrones - 1; ++i)
             {
