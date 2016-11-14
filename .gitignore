@@ -1,2 +1,4 @@
-mTSP_GA/bin
-!mTSP_GA/bin/*.txt
+mTSP_GA/bin/*
+!mTSP_GA/bin/*/
+mTSP_GA/bin/Debug/**
+!mTSP_GA/bin/Debug/*.txt
